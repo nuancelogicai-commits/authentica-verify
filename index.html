@@ -4,224 +4,380 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verify Certificate — Authentica</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: 'DM Sans', -apple-system, sans-serif;
             background: #0D0D0D;
             color: #FFFFFF;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
         }
-        
+
+        /* Ambient glow from top */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background: radial-gradient(ellipse 60% 35% at 50% 0%, rgba(223,124,101,0.07) 0%, transparent 70%);
+            z-index: 0;
+        }
+
         .coral-bar {
             width: 100%;
-            height: 8px;
-            background: #DF7C65;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #DF7C65, transparent);
+            position: relative;
+            z-index: 1;
         }
-        
+
         .container {
-            max-width: 600px;
+            max-width: 520px;
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 48px 24px 60px;
             width: 100%;
+            position: relative;
+            z-index: 1;
         }
-        
+
+        /* Shield + header */
         .header {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 56px;
         }
-        
-        .shield {
-            width: 60px;
-            height: 60px;
-            margin: 0 auto 20px;
+
+        .shield-ring {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 88px;
+            height: 88px;
+            border-radius: 50%;
+            background: radial-gradient(circle at center, rgba(223,124,101,0.13) 0%, transparent 70%);
+            border: 2.5px solid #DF7C65;
+            box-shadow: 0 0 0 7px rgba(223,124,101,0.05), 0 0 28px rgba(223,124,101,0.18);
+            margin-bottom: 20px;
+            position: relative;
         }
-        
+
+        .shield-ring::after {
+            content: '';
+            position: absolute;
+            inset: 7px;
+            border-radius: 50%;
+            border: 1px solid rgba(223,124,101,0.3);
+        }
+
+        .shield-emoji {
+            font-size: 34px;
+            position: relative;
+            z-index: 1;
+        }
+
         .logo-text {
-            font-size: 24px;
-            letter-spacing: 3px;
-            color: #DF7C65;
-            font-weight: 600;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 8px;
+            background: linear-gradient(135deg, #DF7C65 0%, #F0C89A 50%, #DF7C65 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 6px;
         }
-        
+
+        .logo-sub {
+            font-family: 'DM Mono', monospace;
+            font-size: 8px;
+            letter-spacing: 0.22em;
+            color: rgba(223,124,101,0.5);
+        }
+
+        /* Divider lines */
+        .header-divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 14px;
+        }
+
+        .header-divider-line {
+            flex: 1;
+            height: 1px;
+            max-width: 60px;
+        }
+
+        .header-divider-line-left {
+            background: linear-gradient(90deg, transparent, rgba(223,124,101,0.4));
+        }
+
+        .header-divider-line-right {
+            background: linear-gradient(90deg, rgba(223,124,101,0.4), transparent);
+        }
+
+        .header-divider-text {
+            font-family: 'DM Mono', monospace;
+            font-size: 8px;
+            letter-spacing: 0.25em;
+            color: rgba(223,124,101,0.45);
+            white-space: nowrap;
+        }
+
+        /* Input section */
         .input-section {
-            margin-bottom: 40px;
+            margin-bottom: 16px;
         }
-        
+
         .input-label {
             display: block;
-            margin-bottom: 12px;
-            font-size: 16px;
-            color: #CCCCCC;
+            margin-bottom: 10px;
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.18em;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
         }
-        
+
         .input-field {
             width: 100%;
-            padding: 16px;
+            padding: 16px 18px;
             background: #1A1A1A;
-            border: 2px solid #333333;
-            border-radius: 8px;
+            border: 1px solid #333333;
+            border-radius: 10px;
             color: #FFFFFF;
-            font-size: 18px;
+            font-family: 'DM Mono', monospace;
+            font-size: 17px;
+            font-weight: 400;
             text-align: center;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            transition: border-color 0.3s;
+            letter-spacing: 4px;
+            transition: border-color 0.25s, box-shadow 0.25s;
         }
-        
+
+        .input-field::placeholder {
+            color: rgba(255,255,255,0.18);
+            letter-spacing: 3px;
+        }
+
         .input-field:focus {
             outline: none;
             border-color: #DF7C65;
+            box-shadow: 0 0 0 3px rgba(223,124,101,0.1);
         }
-        
+
         .lookup-button {
             width: 100%;
-            padding: 18px;
-            background: #DF7C65;
+            padding: 16px;
+            background: linear-gradient(135deg, #DF7C65, #C4613E);
             color: #000000;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
             cursor: pointer;
-            transition: opacity 0.3s;
+            transition: opacity 0.2s, box-shadow 0.2s;
+            box-shadow: 0 6px 24px rgba(223,124,101,0.28);
+            margin-top: 12px;
         }
-        
+
         .lookup-button:hover {
             opacity: 0.9;
+            box-shadow: 0 8px 32px rgba(223,124,101,0.38);
         }
-        
+
         .lookup-button:disabled {
-            opacity: 0.5;
+            opacity: 0.45;
             cursor: not-allowed;
+            box-shadow: none;
         }
-        
+
+        /* Result card */
         .result-card {
             display: none;
-            background: #1A1A1A;
-            border-radius: 12px;
-            padding: 40px 30px;
-            margin-top: 40px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(223,124,101,0.15);
+            border-radius: 16px;
+            padding: 36px 28px;
+            margin-top: 28px;
             text-align: center;
         }
-        
+
         .result-card.show {
             display: block;
         }
-        
+
         .verdict {
-            font-size: 48px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 52px;
             font-weight: 700;
-            margin-bottom: 20px;
+            letter-spacing: 6px;
+            margin-bottom: 16px;
+            line-height: 1;
         }
-        
+
         .verdict.authentic {
             color: #52C478;
         }
-        
+
         .verdict.counterfeit {
             color: #DF7C65;
         }
-        
+
         .confidence {
-            font-size: 28px;
-            margin-bottom: 10px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 26px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.85);
+            margin-bottom: 8px;
         }
-        
+
         .category-pill {
             display: inline-block;
-            padding: 8px 20px;
-            border: 1px solid #555555;
+            padding: 6px 18px;
+            border: 1px solid #333333;
             border-radius: 20px;
-            color: #AAAAAA;
-            font-size: 16px;
-            margin: 20px 0;
+            color: rgba(255,255,255,0.5);
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.14em;
+            margin: 16px 0;
+            text-transform: uppercase;
         }
-        
+
         .scan-date {
-            color: #888888;
-            font-size: 14px;
-            margin: 15px 0;
+            color: rgba(255,255,255,0.35);
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            margin: 12px 0;
         }
-        
+
         .markers {
-            color: #AAAAAA;
-            font-size: 16px;
-            margin: 15px 0;
+            color: rgba(255,255,255,0.45);
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            margin: 12px 0;
         }
-        
+
         .verified-badge {
-            margin-top: 30px;
-            padding-top: 30px;
-            border-top: 1px solid #333333;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid #222222;
             color: #DF7C65;
-            font-size: 16px;
-            font-weight: 600;
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
         }
-        
+
         .cert-ref-display {
-            color: #666666;
-            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             margin-top: 10px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 6px;
+            padding: 6px 14px;
         }
-        
+
+        .cert-ref-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 0.12em;
+            color: rgba(255,255,255,0.3);
+            text-transform: uppercase;
+        }
+
+        .cert-ref-value {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: rgba(255,255,255,0.65);
+        }
+
+        /* Error */
         .error-message {
             display: none;
-            background: #2A1A1A;
-            border: 1px solid #DF7C65;
-            border-radius: 8px;
-            padding: 20px;
+            background: rgba(223,124,101,0.06);
+            border: 1px solid rgba(223,124,101,0.3);
+            border-radius: 10px;
+            padding: 18px 20px;
             margin-top: 20px;
             text-align: center;
             color: #DF7C65;
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.1em;
         }
-        
+
         .error-message.show {
             display: block;
         }
-        
-        @media (max-width: 640px) {
-            .verdict {
-                font-size: 36px;
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 40px 16px 48px;
             }
-            
+
+            .verdict {
+                font-size: 40px;
+            }
+
             .confidence {
+                font-size: 22px;
+            }
+
+            .logo-text {
                 font-size: 24px;
+                letter-spacing: 6px;
             }
         }
     </style>
 </head>
 <body>
     <div class="coral-bar"></div>
-    
+
     <div class="container">
         <div class="header">
-            <svg class="shield" viewBox="0 0 100 120" fill="#DF7C65">
-                <path d="M50 0 L100 20 L100 60 Q100 100 50 120 Q0 100 0 60 L0 20 Z"/>
-            </svg>
+            <div class="shield-ring">
+                <span class="shield-emoji">🛡️</span>
+            </div>
             <div class="logo-text">AUTHENTICA</div>
+            <div class="logo-sub">AI AUTHENTICATION ENGINE</div>
+            <div class="header-divider">
+                <div class="header-divider-line header-divider-line-left"></div>
+                <div class="header-divider-text">✦ CERTIFICATE VERIFICATION ✦</div>
+                <div class="header-divider-line header-divider-line-right"></div>
+            </div>
         </div>
-        
+
         <div class="input-section">
-            <label class="input-label" for="certInput">Enter Certificate ID</label>
-            <input 
-                type="text" 
-                id="certInput" 
-                class="input-field" 
+            <label class="input-label" for="certInput">Certificate ID</label>
+            <input
+                type="text"
+                id="certInput"
+                class="input-field"
                 placeholder="AUTH-XXXXXXXX"
                 maxlength="16"
             >
         </div>
-        
+
         <button class="lookup-button" id="lookupBtn">Verify Certificate</button>
-        
+
         <div class="result-card" id="resultCard">
             <div class="verdict" id="verdict"></div>
             <div class="confidence" id="confidence"></div>
@@ -229,58 +385,60 @@
             <div class="scan-date" id="scanDate"></div>
             <div class="markers" id="markers"></div>
             <div class="verified-badge">Verified by Authentica</div>
-            <div class="cert-ref-display" id="certRefDisplay"></div>
+            <div class="cert-ref-display">
+                <span class="cert-ref-label">REF</span>
+                <span class="cert-ref-value" id="certRefDisplay"></span>
+            </div>
         </div>
-        
+
         <div class="error-message" id="errorMessage">
             Certificate not found. This ID does not match any Authentica scan.
         </div>
     </div>
-    
+
     <script>
         const certInput = document.getElementById('certInput');
         const lookupBtn = document.getElementById('lookupBtn');
         const resultCard = document.getElementById('resultCard');
         const errorMessage = document.getElementById('errorMessage');
-        
+
         certInput.addEventListener('input', (e) => {
             e.target.value = e.target.value.toUpperCase();
         });
-        
+
         lookupBtn.addEventListener('click', async () => {
             const certId = certInput.value.trim();
-            
+
             if (!certId) {
                 return;
             }
-            
+
             resultCard.classList.remove('show');
             errorMessage.classList.remove('show');
             lookupBtn.disabled = true;
             lookupBtn.textContent = 'Verifying...';
-            
+
             try {
                 const response = await fetch(`https://authenticabackend-production.up.railway.app/verify/${certId}`);
-                
+
                 if (!response.ok) {
                     throw new Error('Not found');
                 }
-                
+
                 const data = await response.json();
-                
-                // Populate result card
+
                 const verdict = document.getElementById('verdict');
                 verdict.textContent = data.verdict;
                 verdict.className = 'verdict ' + (data.verdict === 'AUTHENTIC' ? 'authentic' : 'counterfeit');
-                
+
                 document.getElementById('confidence').textContent = `${data.confidence}% confidence`;
                 document.getElementById('category').textContent = data.category || 'Unknown';
                 document.getElementById('scanDate').textContent = `Scanned: ${new Date(data.timestamp).toLocaleDateString()}`;
                 document.getElementById('markers').textContent = `${data.markers_checked || 7}/7 markers checked`;
                 document.getElementById('certRefDisplay').textContent = certId;
-                
+
                 resultCard.classList.add('show');
-                
+
             } catch (error) {
                 errorMessage.classList.add('show');
             } finally {
@@ -288,7 +446,7 @@
                 lookupBtn.textContent = 'Verify Certificate';
             }
         });
-        
+
         certInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 lookupBtn.click();
